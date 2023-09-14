@@ -1,0 +1,178 @@
+{
+  "name": "check_for_inconsistent_settings_on_brokers_across_kafka_cluster",
+  "description": "This incident type refers to the occurrence of inconsistent settings across the brokers in a Kafka cluster. A Kafka cluster is a group of servers that work together to process and store data streams. Each server in a Kafka cluster is called a broker. Inconsistent settings can cause issues with data processing, storage, and retrieval, leading to potential data loss or corruption. This incident requires a thorough investigation of the settings on each broker to identify any discrepancies and ensure that all settings are consistent across the cluster.",
+  "params": [
+    {
+      "name": "TOPIC_NAME",
+      "value": ""
+    },
+    {
+      "name": "BROKER1",
+      "value": ""
+    },
+    {
+      "name": "GROUP_ID",
+      "value": ""
+    },
+    {
+      "name": "_SSH_BROKER2",
+      "value": ""
+    },
+    {
+      "name": "BROKER1_9092_BROKER2_9092",
+      "value": ""
+    },
+    {
+      "name": "BOOTSTRAP_SERVER",
+      "value": ""
+    },
+    {
+      "name": "BROKER2",
+      "value": ""
+    },
+    {
+      "name": "PROPERTY",
+      "value": ""
+    },
+    {
+      "name": "ZOOKEEPER_HOST",
+      "value": ""
+    },
+    {
+      "name": "_SSH_BROKER1",
+      "value": ""
+    },
+    {
+      "name": "1_N",
+      "value": ""
+    },
+    {
+      "name": "HOST_NAME",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check for inconsistent settings on brokers across Kafka cluster\nThis incident type refers to the occurrence of inconsistent settings across the brokers in a Kafka cluster. A Kafka cluster is a group of servers that work together to process and store data streams. Each server in a Kafka cluster is called a broker. Inconsistent settings can cause issues with data processing, storage, and retrieval, leading to potential data loss or corruption. This incident requires a thorough investigation of the settings on each broker to identify any discrepancies and ensure that all settings are consistent across the cluster."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if all brokers are running"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `systemctl status kafka-broker-${1_N}`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check broker configuration"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `cat /etc/kafka/server.properties | grep -i ${PROPERTY}`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check broker logs for errors"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `journalctl -u kafka-broker-${1_N} | grep -i error`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check broker resource utilization"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `top | grep -i kafka-broker-${1_N}`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check consistency of broker settings"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `diff ${_SSH_BROKER1} \"cat /etc/kafka/server.properties\") ${_SSH_BROKER2} \"cat /etc/kafka/server.properties\")`"
+    },
+    {
+      "name": "cell_12",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check network connectivity between brokers"
+    },
+    {
+      "name": "cell_13",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `ping ${BROKER1} ${BROKER2}`"
+    },
+    {
+      "name": "cell_14",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check leader election status"
+    },
+    {
+      "name": "cell_15",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `kafka-topics --describe --zookeeper ${ZOOKEEPER_HOST} --topic ${TOPIC_NAME}`"
+    },
+    {
+      "name": "cell_16",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if replicas are in sync"
+    },
+    {
+      "name": "cell_17",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `kafka-replica-verification --broker-list ${BROKER1_9092_BROKER2_9092} --topic ${TOPIC_NAME} --group-id ${GROUP_ID}`"
+    },
+    {
+      "name": "cell_18",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check if there are any unclean leader elections"
+    },
+    {
+      "name": "cell_19",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `kafka-consumer-groups --bootstrap-server ${BOOTSTRAP_SERVER} --describe --group ${GROUP_ID}`"
+    }
+  ]
+}
