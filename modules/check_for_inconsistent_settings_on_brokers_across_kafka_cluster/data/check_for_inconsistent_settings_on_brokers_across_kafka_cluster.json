@@ -7,27 +7,15 @@
       "value": ""
     },
     {
-      "name": "BROKER1",
-      "value": ""
-    },
-    {
       "name": "GROUP_ID",
       "value": ""
     },
     {
-      "name": "_SSH_BROKER2",
+      "name": "1_N",
       "value": ""
     },
     {
       "name": "BROKER1_9092_BROKER2_9092",
-      "value": ""
-    },
-    {
-      "name": "BOOTSTRAP_SERVER",
-      "value": ""
-    },
-    {
-      "name": "BROKER2",
       "value": ""
     },
     {
@@ -39,11 +27,23 @@
       "value": ""
     },
     {
+      "name": "_SSH_BROKER2",
+      "value": ""
+    },
+    {
+      "name": "BOOTSTRAP_SERVER",
+      "value": ""
+    },
+    {
+      "name": "BROKER1",
+      "value": ""
+    },
+    {
       "name": "_SSH_BROKER1",
       "value": ""
     },
     {
-      "name": "1_N",
+      "name": "BROKER2",
       "value": ""
     },
     {
