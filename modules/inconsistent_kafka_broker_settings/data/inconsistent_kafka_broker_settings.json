@@ -1,0 +1,114 @@
+{
+  "name": "inconsistent_kafka_broker_settings",
+  "description": "This incident type refers to the situation where there are inconsistencies in the settings of brokers across a Kafka cluster. Kafka is a distributed streaming platform that operates in a cluster of servers called brokers. These brokers work together to maintain and replicate the data stored in Kafka topics. Inconsistencies in broker settings can lead to data loss, reduced performance, and other operational issues. Therefore, it is crucial to ensure that all Kafka brokers have consistent settings.",
+  "params": [
+    {
+      "name": "BROKER_PORT",
+      "value": ""
+    },
+    {
+      "name": "PATH_TO_KAFKA_BIN",
+      "value": ""
+    },
+    {
+      "name": "BROKER_HOST",
+      "value": ""
+    },
+    {
+      "name": "ZK_PORT",
+      "value": ""
+    },
+    {
+      "name": "ZK_HOST",
+      "value": ""
+    },
+    {
+      "name": "BROKER_CONFIG_FILE",
+      "value": ""
+    },
+    {
+      "name": "KAFKA_HOME",
+      "value": ""
+    },
+    {
+      "name": "HOST_NAME",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Inconsistent Kafka Broker Settings.\nThis incident type refers to the situation where there are inconsistencies in the settings of brokers across a Kafka cluster. Kafka is a distributed streaming platform that operates in a cluster of servers called brokers. These brokers work together to maintain and replicate the data stored in Kafka topics. Inconsistencies in broker settings can lead to data loss, reduced performance, and other operational issues. Therefore, it is crucial to ensure that all Kafka brokers have consistent settings."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the number of brokers on the Kafka cluster"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `${PATH_TO_KAFKA_BIN}/kafka-topics.sh --zookeeper ${ZK_HOST}:${ZK_PORT} --list`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the status of each broker in the Kafka cluster"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `${PATH_TO_KAFKA_BIN}/kafka-broker-api-versions.sh --bootstrap-server ${BROKER_HOST}:${BROKER_PORT}`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the setting values on each broker in the Kafka cluster"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `${PATH_TO_KAFKA_BIN}/kafka-configs.sh --bootstrap-server ${BROKER_HOST}:${BROKER_PORT} --entity-type brokers --describe`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the consistency of the broker settings across the Kafka cluster"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `${PATH_TO_KAFKA_BIN}/kafka-configs.sh --bootstrap-server ${BROKER_HOST}:${BROKER_PORT} --entity-type brokers --describe | awk '{print $2}' | uniq -c`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Update the configuration settings for affected Kafka brokers to ensure consistency across the cluster."
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_kafka_broker_config_update($BROKER_CONFIG_FILE, $KAFKA_HOME)"
+    }
+  ]
+}

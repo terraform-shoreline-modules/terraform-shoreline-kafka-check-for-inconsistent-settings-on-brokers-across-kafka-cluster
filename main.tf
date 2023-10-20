@@ -14,8 +14,8 @@ provider "shoreline" {
   debug = true
 }
 
-module "check_for_inconsistent_settings_on_brokers_across_kafka_cluster" {
-  source    = "./modules/check_for_inconsistent_settings_on_brokers_across_kafka_cluster"
+module "inconsistent_kafka_broker_settings" {
+  source    = "./modules/inconsistent_kafka_broker_settings"
 
   providers = {
     shoreline = shoreline
